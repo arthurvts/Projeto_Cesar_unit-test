@@ -1,10 +1,13 @@
 package school.cesar.unit;
 
+import java.time.Instant;
+
 public class EmailAccountBuilder {
 
     private String user;
     private String domain;
     private String password;
+    private Instant lastPasswordUpdate;
 
     public EmailAccountBuilder(){}
 
@@ -23,8 +26,13 @@ public class EmailAccountBuilder {
         return this;
     }
 
+    public EmailAccountBuilder setLastPasswordUpdate(Instant lastPasswordUpdate) {
+        this.lastPasswordUpdate = lastPasswordUpdate;
+        return this;
+    }
+
     public EmailAccount build(){
 
-        return new EmailAccount(user, domain, password);
+        return new EmailAccount(user, domain, password, lastPasswordUpdate);
     }
 }

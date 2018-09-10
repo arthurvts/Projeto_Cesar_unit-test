@@ -1,6 +1,7 @@
 package school.cesar.unit;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 
 public class EmailAccount {
@@ -8,11 +9,13 @@ public class EmailAccount {
     private String user;
     private String domain;
     private String password;
+    private Instant lastPasswordUpdate;
 
-    public EmailAccount(String user, String domain, String password){
+    public EmailAccount(String user, String domain, String password, Instant lastPasswordUpdate){
         this.user = user;
         this.domain = domain;
         this.password = password;
+        this.lastPasswordUpdate = lastPasswordUpdate;
 
     }
 
@@ -40,9 +43,27 @@ public class EmailAccount {
         this.password = password;
     }
 
-    public boolean verifyPasswordExpiration(){
-        return false; //todo
+    public Instant getLastPasswordUpdate() {
+        return lastPasswordUpdate;
     }
 
+    public void setLastPasswordUpdate(Instant lastPasswordUpdate) {
+        this.lastPasswordUpdate = lastPasswordUpdate;
+    }
+
+
+    //metodo
+
+    public boolean verifyPasswordExpiration(){
+
+        LocalDate today = LocalDate.now();
+        if (lastPasswordUpdate.isAfter(Instant.from(today.minusDays(90)))){
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    }
 
 }

@@ -52,12 +52,17 @@ public class EmailAccount {
     }
 
 
-    //metodo
+    //metodos
 
-    public boolean verifyPasswordExpiration(){
+    public boolean isPasswordValid(String password, Instant lastPasswordUpdate) {
+        return password.length() >= 6 && verifyPasswordExpiration(lastPasswordUpdate);
+
+    }
+
+        public boolean verifyPasswordExpiration(Instant lastPasswordUpdate){
 
         LocalDate today = LocalDate.now();
-        if (lastPasswordUpdate.isAfter(Instant.from(today.minusDays(90)))){
+        if (this.lastPasswordUpdate.isAfter(Instant.from(today.minusDays(90)))){
             return false;
         }
         else {

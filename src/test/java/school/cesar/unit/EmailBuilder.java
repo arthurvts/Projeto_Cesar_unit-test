@@ -53,7 +53,8 @@ public class EmailBuilder {
     }
 
     public Email build(){
-        return new Email(creationDate,from, to, cc, bcc,subject, message);
+
+        return new Email(creationDate, from, to, cc, bcc, subject, message);
     }
 
 

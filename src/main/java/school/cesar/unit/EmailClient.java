@@ -1,110 +1,130 @@
 package school.cesar.unit;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class EmailClient {
 
-    private Collection<EmailAccount> accounts;
     private EmailService emailService;
-    private Email email;
 
-
-    public EmailClient(Collection<EmailAccount> account, EmailService emailService, Email email){
-
-        this.accounts = account;
-        this.emailService = emailService;
-        this.email = email;
-    }
-
-    public Collection<EmailAccount> getAccounts() {
-        return accounts;
-    }
-
-    public void setAccounts(Collection<EmailAccount> accounts) {
-        this.accounts = accounts;
-    }
-
-    public EmailService getEmailService() {
-        return emailService;
-    }
 
     public void setEmailService(EmailService emailService) {
         this.emailService = emailService;
     }
 
-    public Email getEmail() {
-        return email;
-    }
-
-    public void setEmail(Email email) {
-        this.email = email;
-    }
-
-    //metodos usando o padrao Regex
-
-    public static boolean isValidUser(String user){
+    public boolean isAValidUser(String user) {
         return user.matches("[a-zA-Z0-9._-]+");
     }
 
-    public static boolean isValidDomain(String domain){
-        if(domain.contains("..")){
+    public boolean isAValidDomain(String domain) {
+        if (domain.contains("..")) {
             return false;
         } else {
             return domain.matches("^(?!\\.)[a-zA-Z0-9.]*[^.]$");
         }
     }
 
-    public static boolean isValidAddress(String emailAddress){
+//Um endereço é considerado valido se possuir usuario valido, seguido pelo caractere arroba (@) e posteriormente um dominio valido.
+
+    public boolean isValidAddress(String emailAddress) {
         String[] temp = emailAddress.split("@");
 
-        try {
-            String userPattern = "^([a-zA-Z]|[0-9]|[.]|[_]|[-])*$";
-            String domainPattern = "^([a-zA-Z]|[0-9])+(\\.([a-zA-Z]|[0-9])+)+$";
-            java.util.regex.Pattern p = java.util.regex.Pattern.compile(userPattern);
-            java.util.regex.Matcher m = p.matcher(temp[0]);
-            java.util.regex.Pattern p1 = java.util.regex.Pattern.compile(domainPattern);
-            java.util.regex.Matcher m1 = p1.matcher(temp[1]);
-            return m.matches() && m1.matches();
-        } catch (Exception e){
+        if (emailAddress.split("@").length == 2) {
+
+            String user = emailAddress.split("@")[0];
+            String domain = emailAddress.split("@")[1];
+
+            return isAValidUser(user) && isAValidDomain(domain);
+        } else {
             return false;
         }
     }
 
+    public boolean isValidAddress(Collection<String> emailAddresses) {
+        boolean flag = true;
 
-    public static boolean isValidEmail(Email email){
-        return false; //todo
+        for (String emailAddress : emailAddresses) {
+            if (!isValidAddress(emailAddress)) {
+                flag = false;
+            }
+        }
+        return flag;
     }
+
+
+    public boolean isValidEmail(Email email) {
+
+        //creationDate valido
+        if (email.getCreationDate() != null) {
+            //endereço valido
+            if (isValidAddress(email.getFrom())) {
+                //to valido
+                if (email.getTo().size() != 0 && isValidAddress(email.getTo())) {
+                    //Cc valido
+                    if (email.getCc().size() != 0 && !isValidAddress(email.getCc())) {
+
+                        return false;
+                    }
+
+                    if (email.getBcc().size() != 0 && !isValidAddress(email.getBcc())) {
+
+                        return false;
+                    }
+                } else return false;
+            } else return false;
+        } else return false;
+
+        return true;
+    }
+
 
     //Se password for invalido, levanta uma exceção do tipo RuntimeException.
 
-    public Collection<Email> emailList(EmailAccount emailAccount){
+    public Collection<Email> emailList(EmailAccount emailAccount) {
 
-        if(emailAccount.isPasswordValid(emailAccount.getPassword(), emailAccount.getLastPasswordUpdate())){
+        if (emailAccount.isPasswordValid(emailAccount.getPassword(), emailAccount.getLastPasswordUpdate())) {
             return emailService.emailList(emailAccount);
         } else {
-            throw new RuntimeException("Password has been expired.");
+            throw new RuntimeException("Your password has been expired.");
         }
-
     }
 
     //verifica se o email é válido. Se for falso, retorna uma exceção do tipo RuntimeException.
 
-    public void sendEmail(Email email){
+    public void sendEmail(Email email) {
 
-        if(isValidEmail(email)){
+        if (isValidEmail(email)) {
             emailService.sendEmail(email);
         } else {
-            throw new RuntimeException("Invalid email.");
+            throw new RuntimeException("This is an invalid email.");
         }
-
-
     }
 
-    boolean createAccount(EmailAccount account){
-        return false;
+    //verifica se o usuario e o dominio são validos;
+    //verifica se o password é maior que 6 caracteres;
+    //adiciona data atual ao lastPasswordUpdate;
+    //adiciona objeto a coleção accounts.
+
+    boolean createAccount(EmailAccount account) {
+        Collection<EmailAccount> accounts = new ArrayList<EmailAccount>();
+
+        if (isAValidUser(account.getUser())) {
+
+            if (isAValidDomain(account.getDomain())) {
+
+                if (account.isPasswordMoreThanSixCharactersLong(account.getPassword())) {
+
+                    account.setLastPasswordUpdate(Instant.now());
+
+                    return accounts.add(account);
+                }
+                else return false;
+            }
+            else return false;
+        }
+        else return false;
     }
-
-
 
 }
+

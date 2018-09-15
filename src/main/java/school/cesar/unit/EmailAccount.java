@@ -1,8 +1,9 @@
 package school.cesar.unit;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Collection;
+import java.time.temporal.ChronoUnit;
+
 
 public class EmailAccount {
 
@@ -55,20 +56,22 @@ public class EmailAccount {
     //metodos
 
     public boolean isPasswordValid(String password, Instant lastPasswordUpdate) {
-        return password.length() >= 6 && verifyPasswordExpiration(lastPasswordUpdate);
-
+        return isPasswordMoreThanSixCharactersLong(password) && verifyPasswordExpiration(lastPasswordUpdate);
     }
 
-        public boolean verifyPasswordExpiration(Instant lastPasswordUpdate){
-
-        LocalDate today = LocalDate.now();
-        if (this.lastPasswordUpdate.isAfter(Instant.from(today.minusDays(90)))){
-            return false;
-        }
-        else {
-            return true;
-        }
-
+    public boolean isPasswordMoreThanSixCharactersLong(String password) {
+        return password.length() >= 6;
     }
+
+    public boolean verifyPasswordExpiration(Instant lastPasswordUpdate){
+
+        return daysFromLatestPasswordUpdate(lastPasswordUpdate) <= 90;
+    }
+    public long daysFromLatestPasswordUpdate(Instant lastPasswordUpdate) {
+        Instant currentInstant = Instant.now();
+        long numberOfDays = ChronoUnit.DAYS.between(lastPasswordUpdate, currentInstant);
+        return numberOfDays;
+    }
+
 
 }

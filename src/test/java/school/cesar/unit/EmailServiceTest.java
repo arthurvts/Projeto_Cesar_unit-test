@@ -52,38 +52,6 @@ public class EmailServiceTest {
 
     }
 
-    @Test
-    public void emailList_ThrowsException_WhenIsPasswordValidFalse() {
-        EmailService emailService = new EmailService() {
-            @Override
-            public boolean sendEmail(Email email) {
-                return false;
-            }
-
-            @Override
-            public Collection<Email> emailList(EmailAccount account) {
-                return null;
-            }
-        };
-
-        EmailClient emailClient = new EmailClient();
-
-        String user = "avts";
-        String domain = "hotmail";
-        String password = "012";
-        Instant lastPasswordUpdate = Instant.now();
-        EmailAccount account = new EmailAccount(user, domain, password, lastPasswordUpdate) {
-            @Override
-            public boolean isPasswordValid(String password, Instant lastPasswordUpdate) {
-                return false;
-            }
-
-        };
-
-        emailClient.setEmailService(emailService);
-
-        Assertions.assertThrows(RuntimeException.class, () -> emailClient.emailList(account));
-    }
 
 
     @Test

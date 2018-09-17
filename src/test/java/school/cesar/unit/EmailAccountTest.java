@@ -124,4 +124,13 @@ public class EmailAccountTest {
         return cal.getTime();
     }
 
+    @Test
+    public void verifyDaysFromLastPasswordUpdate_90Days() {
+
+        emailAccount = new EmailAccountBuilder()
+                .setLastPasswordUpdate(daysSinceToday(-90).toInstant())
+                .build();
+        Assertions.assertEquals(90, emailAccount.daysFromLatestPasswordUpdate(emailAccount.getLastPasswordUpdate()));
+    }
+
 }

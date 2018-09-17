@@ -133,4 +133,18 @@ public class EmailAccountTest {
         Assertions.assertEquals(90, emailAccount.daysFromLatestPasswordUpdate(emailAccount.getLastPasswordUpdate()));
     }
 
+    @Test
+    public void verifyUserAndPasswordExpiration(){
+        emailAccount = new EmailAccountBuilder()
+                .setUser("ghfkslk")
+                .setPassword("987651")
+                .setDomain("hotmail")
+                .build();
+
+        Assertions.assertEquals(true, emailAccount.verifyPasswordExpiration(Instant.now()));
+
+
+
+    }
+
 }
